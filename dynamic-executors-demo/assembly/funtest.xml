@@ -1,0 +1,56 @@
+<assembly xmlns="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		  xsi:schemaLocation="http://maven.apache.org/plugins/maven-assembly-plugin/assembly/1.1.2 http://maven.apache.org/xsd/assembly-1.1.2.xsd">
+
+	<id>funtest</id>
+	<includeBaseDirectory>true</includeBaseDirectory>
+	<formats>
+		<format>tar.gz</format>
+	</formats>
+
+	<files>
+		<file>
+			<source>assembly/classpath.classworlds</source>
+			<outputDirectory>/</outputDirectory>
+			<fileMode>755</fileMode>
+		</file>
+	</files>
+
+	<fileSets>
+		<fileSet>
+			<directory>assembly/bin</directory>
+			<outputDirectory>bin</outputDirectory>
+			<fileMode>755</fileMode>
+			<lineEnding>unix</lineEnding>
+		</fileSet>
+
+		<fileSet>
+			<directory>webapp</directory>
+			<outputDirectory>webapp</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>target/classes</directory>
+			<outputDirectory>classes</outputDirectory>
+			<includes>
+				<include>**/*.class</include>
+			</includes>
+		</fileSet>
+
+		<fileSet>
+			<directory>profiles/common</directory>
+			<outputDirectory>conf</outputDirectory>
+		</fileSet>
+
+		<fileSet>
+			<directory>profiles/funtest</directory>
+			<outputDirectory>conf</outputDirectory>
+		</fileSet>
+	</fileSets>
+
+	<dependencySets>
+		<dependencySet>
+			<useProjectArtifact>false</useProjectArtifact>
+			<outputDirectory>libs</outputDirectory>
+		</dependencySet>
+	</dependencySets>
+</assembly>

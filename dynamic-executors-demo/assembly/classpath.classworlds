@@ -1,0 +1,7 @@
+main is com.moreopen.executors.demo.launcher.ServerLauncher from executors
+
+[executors]
+load /opt/libs/trace/*.jar
+load ${project.home}/libs/*.jar
+load ${project.home}/conf
+load ${project.home}/classes

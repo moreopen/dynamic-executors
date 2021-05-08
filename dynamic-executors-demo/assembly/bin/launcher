@@ -1,0 +1,74 @@
+#!/bin/bash
+
+cygwin=false;
+case "`uname`" in
+  CYGWIN*) cygwin=true ;;
+esac
+
+noJavaHome=false
+if [ -z "$JAVA_HOME" ] ; then
+    noJavaHome=true
+fi
+if $cygwin ; then
+    [ -n "$JAVA_HOME" ] &&
+        JAVA_HOME=`cygpath -u "$JAVA_HOME"`
+fi
+if [ ! -e "$JAVA_HOME/bin/java" ] ; then
+    noJavaHome=true
+fi
+if $noJavaHome ; then
+    echo "Error: JAVA_HOME environment variable is not set."
+    exit 1
+fi
+
+CURR_DIR=`pwd`
+cd `dirname "$0"`/..
+PROJECT_HOME=`pwd`
+cd $CURR_DIR
+
+if [ -z "$PROJECT_HOME" ] ; then
+    echo
+    echo "error, environment variable PROJECT_HOME not found "
+    echo
+    exit 1
+fi
+
+if [ -f "$PROJECT_HOME/bin/common.properties" ]; then
+. $PROJECT_HOME/bin/common.properties
+fi
+
+if [ -f "/opt/libs/trace/jvmps" ]; then
+. /opt/libs/trace/jvmps
+else
+  echo
+  echo "[jvmps] error, /opt/libs/trace/jvmps not exist"
+  echo
+  exit 1
+fi
+
+if [ -z "$APP_OUTPUT_PATH" ] ; then
+    echo
+    echo "error, environment variable APP_OUTPUT_PATH not found" 
+    echo
+    exit 1
+fi
+
+if [ ! -d $APP_OUTPUT_PATH ] ; then
+    $PROJECT_HOME/bin/mkdirhier $APP_OUTPUT_PATH
+fi
+
+CLASSPATH="$PROJECT_HOME/libs/plexus-classworlds-2.4.4-HEXNOVA.jar"
+MAIN_CLASS="org.codehaus.classworlds.Launcher"
+
+if $cygwin ; then
+    JAVA_HOME=`cygpath -w "$JAVA_HOME"`
+    PROJECT_HOME=`cygpath -w "$PROJECT_HOME"`
+    CLASSPATH=`cygpath -p -w "$CLASSPATH"`
+fi
+
+
+DEFAULT_OPTS="$DEFAULT_OPTS -Dproject.home=\"$PROJECT_HOME\"  -Dproject.name=\"$APP_NAME\" -Dproject.output=\"$APP_OUTPUT_PATH\" -Dignore.signals=\"$IGNORE_SIGNALS\" "
+DEFAULT_OPTS="$DEFAULT_OPTS -Dclassworlds.conf=\"$PROJECT_HOME/classpath.classworlds\""
+
+CMD="\"$JAVA_HOME/bin/java\" $JVM_OPTIONS  $DEFAULT_OPTS $APP_OPTIONS -classpath \"$CLASSPATH\"  $MAIN_CLASS $APP_ARGS $@ > $APP_CONSOLE_LOG 2>&1 &"
+eval $CMD

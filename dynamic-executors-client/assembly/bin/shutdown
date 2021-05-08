@@ -1,0 +1,63 @@
+#!/bin/bash
+
+cygwin=false;
+case "`uname`" in
+  CYGWIN*) cygwin=true ;;
+esac
+
+noJavaHome=false
+if [ -z "$JAVA_HOME" ] ; then
+    noJavaHome=true
+fi
+if $cygwin ; then
+    [ -n "$JAVA_HOME" ] &&
+        JAVA_HOME=`cygpath -u "$JAVA_HOME"`
+fi
+if [ ! -e "$JAVA_HOME/bin/java" ] ; then
+    noJavaHome=true
+fi
+if $noJavaHome ; then
+    echo "Error: JAVA_HOME environment variable is not set."
+    exit 1
+fi
+
+CURR_DIR=`pwd`
+cd `dirname "$0"`/..
+PROJECT_HOME=`pwd`
+cd $CURR_DIR
+
+if [ -z "$PROJECT_HOME" ] ; then
+    echo
+    echo "no java home"
+    echo
+    exit 1
+fi
+
+
+if [ ! -d $PROJECT_HOME'/logs' ] ; then
+    mkdir $PROJECT_HOME'/logs'
+fi
+
+CLASSPATH="$PROJECT_HOME/libs/plexus-classworlds-2.4.4-HEXNOVA.jar"
+MAIN_CLASS="org.codehaus.classworlds.SignalSender"
+
+if $cygwin ; then
+    JAVA_HOME=`cygpath -w "$JAVA_HOME"`
+    PROJECT_HOME=`cygpath -w "$PROJECT_HOME"`
+    CLASSPATH=`cygpath -p -w "$CLASSPATH"`
+fi
+
+if [ -f "$PROJECT_HOME/bin/common.properties" ]; then
+. $PROJECT_HOME/bin/common.properties
+fi
+
+if [ -f "$PROJECT_HOME/jvm.properties" ]; then
+. $PROJECT_HOME/jvm.properties
+fi
+
+
+
+DEFAULT_OPTS="$DEFAULT_OPTS -Dproject.home=\"$PROJECT_HOME\" -Dproject.name=\"$APP_NAME\"  "
+
+CMD="exec  \"$JAVA_HOME/bin/java\"  $DEFAULT_OPTS -classpath \"$CLASSPATH\"  $MAIN_CLASS $@"
+eval $CMD

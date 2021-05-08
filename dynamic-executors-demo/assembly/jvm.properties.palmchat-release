@@ -1,0 +1,29 @@
+cd `dirname "$0"`/..
+WEB_APP_ROOT=`pwd`
+
+APP_OPTIONS="$APP_OPTIONS -Dwebapp=$WEB_APP_ROOT/webapp -DcontextPath=/ -Dport=8888"
+#jetty http threadPool
+APP_OPTIONS="$APP_OPTIONS -DcorePoolSize=300 -DmaxPoolSize=500 -DpoolQueueSize=2000"
+#jetty nio connector
+APP_OPTIONS="$APP_OPTIONS -DmaxIdleTime=10000 -DlowResourcesMaxIdleTime=5000 -DacceptQueueSize=100"
+APP_OPTIONS="$APP_OPTIONS -DenableAccessLog=true -DaccessLogPath=$APP_OUTPUT_PATH"
+APP_OPTIONS="$APP_OPTIONS -Dmonitor.enable=true -Dmonitor.interval=60"
+APP_OPTIONS="$APP_OPTIONS -Dtoolkit.packet.max=40971520"
+APP_OPTIONS="$APP_OPTIONS -Djava.io.tmpdir=$WEB_APP_ROOT"
+APP_OPTIONS="$APP_OPTIONS -Dorg.eclipse.jetty.server.Request.maxFormContentSize=-1"
+
+#app settings
+APP_ARGS="/opt/conf/rs/environment.properties "
+
+#java opts
+JVM_OPTIONS="-server -Xms4g -Xmx4g -XX:PermSize=256m"
+JVM_OPTIONS="$JVM_OPTIONS -XX:+UseG1GC -XX:MaxGCPauseMillis=200 -XX:ParallelGCThreads=8"
+
+JVM_OPTIONS="$JVM_OPTIONS -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xloggc:gc.log"
+
+JVM_OPTIONS="$JVM_OPTIONS -Dfile.encoding=utf-8 -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=$APP_OUTPUT_PATH"
+JVM_OPTIONS="$JVM_OPTIONS -Dsun.net.client.defaultConnectTimeout=10000 -Dsun.net.client.defaultReadTimeout=30000"
+
+#HOST_ADDR=`hostname -i`
+#JVM_OPTIONS="$JVM_OPTIONS -Dcom.sun.management.jmxremote.port=109x -Dcom.sun.management.jmxremote.ssl=false"
+#JVM_OPTIONS="$JVM_OPTIONS -Dcom.sun.management.jmxremote.authenticate=false -Djava.rmi.server.hostname=$HOST_ADDR"
